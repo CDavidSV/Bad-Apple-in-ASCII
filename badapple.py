@@ -10,6 +10,7 @@ import time
 frame = -1
 ASCIICharacters = [' ', ',', ':', ';', '+', '*', '?', '%', 'S', '#', '@']
 Frames = 2191
+# Path to the frames folder.
 FilePath = "./frames/frame"
 
 
