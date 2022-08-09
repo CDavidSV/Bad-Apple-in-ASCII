@@ -15,7 +15,7 @@ In order for it to work you need to install the following Python libraries.
 
 You will also require the video frames wich are found in the following Google Drive link. Just download the zipped file as is and move it to the same folder where the .py file is located. Make sure the folder is named 'frames'.
 
-Google Drive Link: 
+Google Drive Link: https://drive.google.com/drive/folders/1FzIli-jdAG6it_YS7fcSwOFcx7GV1POR?usp=sharing
 
 - - -
 
