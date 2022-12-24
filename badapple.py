@@ -3,42 +3,50 @@
 # Import libraries.
 import os
 import sys
+from playsound import playsound
 import cv2
 from PIL import Image
 import time
 
-frame = -1
 ASCIICharacters = [' ', ',', ':', ';', '+', '*', '?', '%', 'S', '#', '@']
-Frames = 2191
-# Path to the frames folder.
-FilePath = "./frames/frame"
+desiredWidth = 150
 
+# Path to the frames folder.
+fileName = 'bad_apple1.mp4'
 
 # Resizes the image to fit in the terminal (with specified width).
-def resizeImage(image, width=90):
-    (old_width, old_height) = image.size
-    aspect_ratio = float(old_height)/float(old_width)
-    new_height = int((aspect_ratio * width)/2)
-    resized_image = image.resize((width, new_height)).convert('L')
-    return resized_image
-
+def resizeImage(image, width, height):
+    resizedImage = image.resize((int(width), int(height))).convert('L')
+    return resizedImage
 
 # Prints out the generated frame bu converting the resized image into ASCII Characters from the ASCIICharacters array.
-def generateFrame(image, width=90):
-    resizedImage = resizeImage(image)
+def generateFrame(image, width, height):
+    resizedImage = resizeImage(image, width, height)
     pixels = resizedImage.getdata()
     characters = "".join([ASCIICharacters[pixel//25] for pixel in pixels])
-    total_pixels = len(characters)
-    ASCII_image = "\n".join([characters[index:(index + width)]
-                             for index in range(0, total_pixels, width)])
-
-    sys.stdout.write(ASCII_image)
+    totalPixels = len(characters)
+    ASCIIimage = "\n".join([characters[index:(index + width)] for index in range(0, totalPixels, width)])
+    sys.stdout.write(ASCIIimage)
 
 
 # Main loop that goes through all frames from the video.
-for i in range(0, Frames):
-    path = os.path.abspath(FilePath + str(i) + ".png")
-    cap = Image.open(path)
-    os.system('cls')
-    generateFrame(cap)
-    time.sleep(0.1 - (time.time() % 0.1))
+if __name__ == '__main__':
+    video = cv2.VideoCapture(os.path.abspath(f'./{fileName}'))
+    fps = video.get(cv2.CAP_PROP_FPS)
+    oldWidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)
+    oldHeight = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
+    AR = oldWidth / oldHeight
+    newHeight = (desiredWidth / AR) / 2
+    sleepTime = 1 / fps
+
+    playsound("bad_apple.mp3", False)
+    while (True):
+        # Read video frame.
+        ret, frame = video.read()
+
+        if ret:
+            os.system('cls')
+            generateFrame(Image.fromarray(frame), desiredWidth, newHeight)
+            time.sleep(sleepTime - (time.time() % sleepTime))
+        else:
+            break
