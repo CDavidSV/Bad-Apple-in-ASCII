@@ -1,20 +1,28 @@
 # Carlos David Sandoval Vargas.
 
 # Import libraries.
-import os
-import sys
-from playsound import playsound
-import cv2
+from os import system, path
+from sys import stdout
+from cv2 import VideoCapture, CAP_PROP_FPS, CAP_PROP_FRAME_COUNT, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT
 from PIL import Image
-import time
+from time import sleep, time
+from tqdm import tqdm
+from pygame import mixer
 
 ASCIICharacters = [' ', '.', ',', ':', ';', '!', '+', '*', '?', '%', 'S', '#', '@']
-desiredWidth = 150
 asciiFrames = []
+
+# Desired width of the each frame.
+desiredWidth = 125
 
 # Path to the frames folder.
 videoFile = 'bad_apple.mp4' # mp4
 audioFile = 'bad_apple.mp3' # mp3
+
+def play_audio(audioFile):
+    mixer.init()
+    mixer.music.load(path.abspath(f'./{audioFile}'))
+    mixer.music.play()
 
 # Resizes the image to fit in the terminal (with specified width).
 def resizeImage(image, width, height):
@@ -30,50 +38,32 @@ def generateFrame(image, width, height):
     ASCIIimage = "\n".join([characters[index:(index + width)] for index in range(0, totalPixels, width)])
     asciiFrames.append(ASCIIimage)
 
-def progressBar(progressDone, totalProgress):
-    progressDonePercentage = progressDone / totalProgress * 100
-
-    total = 80
-    progreessString = '|'
-
-    for i in range(0, total):
-        if i <= progressDonePercentage * total / 100:
-            progreessString += '█'
-        else:
-           progreessString += ' '
-    progreessString += f'| {round(progressDonePercentage, 1)}%'
-
-    return progreessString
-
 # Main loop that goes through all frames from the video.
 if __name__ == '__main__':
-    video = cv2.VideoCapture(os.path.abspath(f'./{videoFile}'))
-    fps = video.get(cv2.CAP_PROP_FPS)
-    totalFrames = video.get(cv2.CAP_PROP_FRAME_COUNT)
-    oldWidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)
-    oldHeight = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
+    video = VideoCapture(path.abspath(f'./{videoFile}'))
+    fps = video.get(CAP_PROP_FPS)
+    totalFrames = video.get(CAP_PROP_FRAME_COUNT)
+    oldWidth = video.get(CAP_PROP_FRAME_WIDTH)
+    oldHeight = video.get(CAP_PROP_FRAME_HEIGHT)
 
     AR = oldWidth / oldHeight
     newHeight = (desiredWidth / AR) / 2
     sleepTime = 1 / fps
     
-    renderedFrames = 0
+    pbar = tqdm(total=totalFrames, desc="Rendering frames", ncols=100)
     while (True):
         # Read video frame.
         ret, frame = video.read()
         
         if ret:
             generateFrame(Image.fromarray(frame), desiredWidth, newHeight)
-            renderedFrames += 1
-            os.system('cls')
-            print("Rendering frames...")
-            print(progressBar(renderedFrames, totalFrames))
+            pbar.update(1)
         else:
             break
+    pbar.close()
 
-    playsound(audioFile, False)
+    play_audio(audioFile)
     for frame in asciiFrames:
-        os.system('cls')
-        sys.stdout.write(frame)
-        time.sleep(sleepTime - (time.time() % sleepTime)) # Make sure the time between each frame is the same.
-    os.system('cls')
+        stdout.write('\033[H' + frame) # Might not woek on all terminals. Use system('cls') if this doesn't work.
+        sleep(sleepTime - (time() % sleepTime)) # Make sure the time between each frame is the same.
+    system('cls')
