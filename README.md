@@ -10,7 +10,7 @@ In order for it to work you need to install the following Python libraries.
 
 - <a href="https://pypi.org/project/opencv-python/">opencv</a>
 - <a href="https://pillow.readthedocs.io/en/stable/installation.html">Pillow</a>
-- <a href="https://pypi.org/project/playsound/">playsound</a>
+- <a href="https://www.pygame.org/news">Pygame</a>
 
 - - -
 
