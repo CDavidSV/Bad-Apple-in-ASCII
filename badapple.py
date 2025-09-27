@@ -49,12 +49,13 @@ if __name__ == '__main__':
     AR = oldWidth / oldHeight
     newHeight = (desiredWidth / AR) / 2
     sleepTime = 1 / fps
-    
+
+    stdout.write('\033[?25l') # Hide cursor.
     pbar = tqdm(total=totalFrames, desc="Rendering frames", ncols=100)
     while (True):
         # Read video frame.
         ret, frame = video.read()
-        
+
         if ret:
             generateFrame(Image.fromarray(frame), desiredWidth, newHeight)
             pbar.update(1)
@@ -66,4 +67,6 @@ if __name__ == '__main__':
     for frame in asciiFrames:
         stdout.write('\033[H' + frame) # Might not woek on all terminals. Use system('cls') if this doesn't work.
         sleep(sleepTime - (time() % sleepTime)) # Make sure the time between each frame is the same.
+
     system('cls')
+    stdout.write('\033[?25h') # Show cursor.
